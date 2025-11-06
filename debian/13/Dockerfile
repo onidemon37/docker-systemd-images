@@ -9,7 +9,7 @@ LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com>"
 LABEL description="Debian ${DEBIAN_VERSION} with systemd"
 
 # 1. Install essential packages (dbus added) and clean up
-RUN INSTALL_PKGS='findutils iproute2 python3 python3-apt sudo systemd dbus' \
+RUN INSTALL_PKGS="findutils iproute2 python3 python3-apt sudo systemd dbus" \
     && apt-get update && apt-get install $INSTALL_PKGS -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

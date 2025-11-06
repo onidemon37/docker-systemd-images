@@ -18,7 +18,7 @@ RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.l
     echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive
 
 # 2. Install essential packages and build dependencies
-RUN INSTALL_PKGS='findutils iproute2 sudo systemd dbus ca-certificates' \
+RUN INSTALL_PKGS="findutils iproute2 sudo systemd dbus ca-certificates" \
     BUILD_DEPS='wget build-essential libssl-dev zlib1g-dev \
                 libbz2-dev libreadline-dev libsqlite3-dev \
                 libncursesw5-dev libxml2-dev libxmlsec1-dev \
