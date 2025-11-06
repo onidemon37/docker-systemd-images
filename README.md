@@ -17,7 +17,8 @@ The CI/CD pipeline builds and tags the following image families across multiple 
 
 ## ✨ Features and Use Cases
 
-*Key Features*
+**Key Features**
+
 - SystemD Enabled: Fully configured to run SystemD as the PID 1 process, ideal for complex service testing.
 - Optimization: Minimal unnecessary services removed and optimized for speed and size in CI/CD pipelines.
 - Multi-Arch Support: Built using Buildx and QEMU for multi-platform compatibility.
@@ -88,7 +89,7 @@ The build process is managed entirely by GitHub Actions, running on push events 
 | Builders       | Uses Buildx and QEMU for multi-platform support.                       |
 | Tags Generated | Base version (8, 9, 11, 12) and SHA-based tag (<VERSION>-<short_sha>). |
 
-*Running the Workflow Manually*
+**Running the Workflow Manually**
 
 You can manually trigger a build run for specific OS families:
 
