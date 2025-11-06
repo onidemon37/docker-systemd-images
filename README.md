@@ -8,13 +8,10 @@ All resulting container images are stored securely on the GitHub Container Regis
 
 The CI/CD pipeline builds and tags the following image families across multiple OS versions:
 
-|--------------|------------------|-------------------------------------------|
-| OS Family    |  Versions Built  |  Full Image Name Format                   |
-|--------------+------------------+-------------------------------------------|
-| Oracle Linux |  `8`, `9`        |  ghcr.io/sectigo/sectigo-oracle:<VERSION> |
-|--------------+------------------+-------------------------------------------|
-| Debian       |  `11`, `12`      |  ghcr.io/sectigo/sectigo-debian:<VERSION> |
-|--------------+------------------+-------------------------------------------|
+| OS Family         | Versions Built | Full Image Name Format                   |
+| ----------------- | -------------- |                                          |
+| Oracle Linux      | `8`, `9`       | ghcr.io/sectigo/sectigo-oracle:<VERSION> |
+| Debian            | `11`, `12`     | ghcr.io/sectigo/sectigo-debian:<VERSION> |
 
 (Note: sectigo refers to the GitHub user or organization that owns this repository.)
 
@@ -84,17 +81,17 @@ docker build -t sectigo-debian:12 ./debian/12/
 
 The build process is managed entirely by GitHub Actions, running on push events or manually triggered via workflow_dispatch.
 
-|-----------------|-------------------------------------------------------------------------|
-| Feature         |  Details                                                                |
-|-----------------+-------------------------------------------------------------------------|
-| Registry        |  ghcr.io                                                                |
-|-----------------+-------------------------------------------------------------------------|
-| Authentication  |  Uses secrets.GITHUB_TOKEN for GHCR access.                             |
-|-----------------+-------------------------------------------------------------------------|
-| Builders        |  Uses Buildx and QEMU for multi-platform support.                       |
-|-----------------+-------------------------------------------------------------------------|
-| Tags Generated  |  Base version (8, 9, 11, 12) and SHA-based tag (<VERSION>-<short_sha>). |
-|-----------------+-------------------------------------------------------------------------|
+| ---------------|------------------------------------------------------------------------ |
+| Feature        |  Details                                                                |
+| -------------- | ----------------------------------------------------------------------- |
+| Registry       |  ghcr.io                                                                |
+| -------------- | ----------------------------------------------------------------------- |
+| Authentication |  Uses secrets.GITHUB_TOKEN for GHCR access.                             |
+| -------------- |------------------------------------------------------------------------ |
+| Builders       |  Uses Buildx and QEMU for multi-platform support.                       |
+| -------------- |------------------------------------------------------------------------ |
+| Tags Generated |  Base version (8, 9, 11, 12) and SHA-based tag (<VERSION>-<short_sha>). |
+| -------------- | ----------------------------------------------------------------------- |
 
 *Running the Workflow Manually*
 
