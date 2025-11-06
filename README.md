@@ -107,4 +107,4 @@ We welcome contributions! Please follow these guidelines:
 
 1. Test your changes locally using the "Building Locally" guide.
 2. Update documentation or Dockerfiles as necessary.
-3. Submit a Pull Request (PR) with a clear description of your changes
+3. Submit a Pull Request (PR) with a clear description of your changes.
