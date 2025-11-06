@@ -1,8 +1,6 @@
-ARG BUILD_DATE
 FROM oraclelinux:8
 
-LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com" build_date="" \
-      build_date="$BUILD_DATE"
+LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com"
 
 ENV container=docker
 
