@@ -63,7 +63,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/sectigo-oracle:${{ matrix.version }}
-            ghcr.io/sectigo/sectigo-oracle:8
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/sectigo-oracle:${{ matrix.version }}-${{ env.short_sha }}
           cache-from: type=gha,scope=oracle-${{ matrix.version }}
           cache-to: type=gha,mode=max,scope=oracle-${{ matrix.version }}
