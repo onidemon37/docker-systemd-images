@@ -63,6 +63,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/oraclelinux:${{ matrix.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/oraclelinux:${{ matrix.version }}-${{ env.short_sha }}
+
 
 
   build-debian:
@@ -106,7 +108,7 @@ jobs:
           file: ./debian/${{ matrix.version }}/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/sectigo-debian:${{ matrix.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/sectigo-debian:${{ matrix.version }}-${{ env.short_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/debian-:${{ matrix.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/debian:${{ matrix.version }}-${{ env.short_sha }}
           cache-from: type=gha,scope=debian-${{ matrix.version }}
           cache-to: type=gha,mode=max,scope=debian-${{ matrix.version }}
