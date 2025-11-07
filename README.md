@@ -11,7 +11,7 @@ The CI/CD pipeline builds and tags the following image families across multiple 
 | OS Family    | Versions Built   | Full Image Name Format                   |
 |--------------|------------------|------------------------------------------|
 | Oracle Linux | `8`, `9`         | ghcr.io/onidemon37/oraclelinux:<VERSION> |
-| Debian       | `11`, `12`, `13` | ghcr.io/onidemon37/debian:<VERSION> |
+| Debian       | `11`, `12`, `13` | ghcr.io/onidemon37/debian:<VERSION>      |
 
 (Note: onidemon37 refers to the GitHub user or organization that owns this repository.)
 
