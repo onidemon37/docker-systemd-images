@@ -4,7 +4,7 @@
 ARG DEBIAN_VERSION=buster-slim
 FROM debian:${DEBIAN_VERSION}
 
-LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com>"
+LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
 LABEL description="Debian 10 (Buster) with systemd and Python 3.11 for Molecule testing"
 
 ENV container=docker \

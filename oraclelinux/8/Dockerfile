@@ -1,6 +1,6 @@
 FROM oraclelinux:8
 
-LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com"
+LABEL maintainer="Edino Moniz <edinomoniz@gmail.com"
 
 ENV container=docker
 

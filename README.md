@@ -8,12 +8,12 @@ All resulting container images are stored securely on the GitHub Container Regis
 
 The CI/CD pipeline builds and tags the following image families across multiple OS versions:
 
-| OS Family    | Versions Built | Full Image Name Format                   |
-|--------------|----------------|------------------------------------------|
-| Oracle Linux | `8`, `9`       | ghcr.io/sectigo/sectigo-oracle:<VERSION> |
-| Debian       | `11`, `12`     | ghcr.io/sectigo/sectigo-debian:<VERSION> |
+| OS Family    | Versions Built   | Full Image Name Format                   |
+|--------------|------------------|------------------------------------------|
+| Oracle Linux | `8`, `9`         | ghcr.io/onidemon37/oraclelinux:<VERSION> |
+| Debian       | `11`, `12`, `13` | ghcr.io/onidemon37/debian:<VERSION> |
 
-(Note: sectigo refers to the GitHub user or organization that owns this repository.)
+(Note: onidemon37 refers to the GitHub user or organization that owns this repository.)
 
 ## ✨ Features and Use Cases
 
@@ -36,12 +36,12 @@ These images require the Docker container to be run with --privileged and bind-m
 
 1. Direct Docker Run
 
-Replace <sectigo> with your GitHub organization/username.
+Replace onidemon37 with your GitHub organization/username.
 
 ```
 docker run -d --privileged \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-  ghcr.io/<sectigo>/sectigo-oracle:8
+  ghcr.io/onidemon37/oraclelinux:8
 ```
 
 2. With Docker Compose
@@ -49,7 +49,7 @@ docker run -d --privileged \
 ```
 services:
   app:
-    image: ghcr.io/sectigo/sectigo-oracle:8
+    image: ghcr.io/onidemon37/oraclelinux:8
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -60,7 +60,7 @@ services:
 ```
 platforms:
   - name: instance
-    image: ghcr.io/sectigo/sectigo-oracle:8
+    image: ghcr.io/onidemon37/oraclelinux:8
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -72,10 +72,10 @@ To build these images on your local machine, navigate to the project root and us
 
 ```
 # Example: Build Oracle Linux 8
-docker build -t sectigo-oracle:8 ./oraclelinux/8/
+docker build -t oraclelinux:8 ./oraclelinux/8/
 
 # Example: Build Debian 12
-docker build -t sectigo-debian:12 ./debian/12/
+docker build -t debian:12 ./debian/12/
 ```
 
 ## ⚙️ CI/CD Pipeline (.github/workflows/docker-build.yml)

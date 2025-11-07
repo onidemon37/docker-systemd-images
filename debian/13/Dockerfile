@@ -5,7 +5,7 @@ ARG DEBIAN_VERSION=13
 FROM debian:${DEBIAN_VERSION}
 
 # Metadata
-LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com>"
+LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
 LABEL description="Debian ${DEBIAN_VERSION} with systemd"
 
 # 1. Install essential packages (dbus added) and clean up
