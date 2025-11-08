@@ -8,10 +8,10 @@ All resulting container images are stored securely on the GitHub Container Regis
 
 The CI/CD pipeline builds and tags the following image families across multiple OS versions:
 
-| OS Family    | Versions Built   | Full Image Name Format                   |
-|--------------|------------------|------------------------------------------|
-| Oracle Linux | `8`, `9`         | ghcr.io/onidemon37/oraclelinux:<VERSION> |
-| Debian       | `11`, `12`, `13` | ghcr.io/onidemon37/debian:<VERSION>      |
+| OS Family    | Versions Built        | Full Image Name Format                       |
+|--------------|----------------------|----------------------------------------------|
+| Oracle Linux | `8`, `9`             | `ghcr.io/onidemon37/oraclelinux:<VERSION>` |
+| Debian       | `10`, `11`, `12`, `13` | `ghcr.io/onidemon37/debian:<VERSION>`      |
 
 (Note: onidemon37 refers to the GitHub user or organization that owns this repository.)
 
@@ -24,7 +24,8 @@ The CI/CD pipeline builds and tags the following image families across multiple 
 - Multi-Arch Support: Built using Buildx and QEMU for multi-platform compatibility.
 - Version Tagging: Each build receives a base version tag (e.g., :8) and a specific SHA-based tag (e.g., :8-<short_sha>).
 
-* Primary Use Cases *
+**Primary Use Cases**
+
 - Ansible/Molecule infrastructure testing.
 - CI/CD integration tests requiring SystemD or service isolation.
 - Development environments mimicking production service management.
@@ -34,19 +35,19 @@ The CI/CD pipeline builds and tags the following image families across multiple 
 
 These images require the Docker container to be run with --privileged and bind-mount the cgroup file system to enable SystemD functionality.
 
-1. Direct Docker Run
+### Direct Docker Run
 
 Replace onidemon37 with your GitHub organization/username.
 
-```
+```bash
 docker run -d --privileged \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   ghcr.io/onidemon37/oraclelinux:8
 ```
 
-2. With Docker Compose
+### With Docker Compose
 
-```
+```yaml
 services:
   app:
     image: ghcr.io/onidemon37/oraclelinux:8
@@ -55,9 +56,9 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 ```
 
-3. With Molecule/Ansible
+### With Molecule/Ansible
 
-```
+```yaml
 platforms:
   - name: instance
     image: ghcr.io/onidemon37/oraclelinux:8
@@ -66,16 +67,185 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 ```
 
-## 🧑‍💻 Building Locally
+## 🧑‍💻 Local Development
 
-To build these images on your local machine, navigate to the project root and use the following commands.
+### Quick Start with Makefile
 
+This repository includes a comprehensive Makefile to simplify local development and testing:
+
+```bash
+# Show all available targets
+make help
+
+# Build all images
+make all
+
+# Build specific OS family
+make debian          # Build all Debian images
+make oraclelinux     # Build all Oracle Linux images
+
+# Build specific version
+make debian-12       # Build Debian 12
+make oraclelinux-8   # Build Oracle Linux 8
+
+# Test images
+make test            # Test all built images
+make test-debian-12  # Test specific image
+
+# Lint Dockerfiles
+make lint           # Run hadolint on all Dockerfiles
+
+# Clean up
+make clean          # Remove built images and cache
 ```
-# Example: Build Oracle Linux 8
-docker build -t oraclelinux:8 ./oraclelinux/8/
 
-# Example: Build Debian 12
-docker build -t debian:12 ./debian/12/
+### Manual Docker Build Commands
+
+If you prefer to build manually without the Makefile:
+
+```bash
+# Oracle Linux 8
+docker build --build-arg ORACLELINUX_VERSION=8 -t oraclelinux-systemd:8 ./oraclelinux/8/
+
+# Oracle Linux 9
+docker build --build-arg ORACLELINUX_VERSION=9 -t oraclelinux-systemd:9 ./oraclelinux/9/
+
+# Debian 12
+docker build --build-arg DEBIAN_VERSION=12 -t debian-systemd:12 ./debian/12/
+
+# Debian 13
+docker build --build-arg DEBIAN_VERSION=13 -t debian-systemd:13 ./debian/13/
+
+# Debian 11
+docker build --build-arg DEBIAN_VERSION=11 -t debian-systemd:11 ./debian/11/
+
+# Debian 10 (uses buster-slim)
+docker build --build-arg DEBIAN_VERSION=buster-slim -t debian-systemd:10 ./debian/10/
+```
+
+### Testing Built Images
+
+Test that systemd works correctly in your built images:
+
+```bash
+# Test Debian 12
+docker run --rm --privileged \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+  debian-systemd:12 systemctl --version
+
+# Test Oracle Linux 8
+docker run --rm --privileged \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+  oraclelinux-systemd:8 systemctl --version
+```
+
+### Development Environment Setup
+
+#### Quick Setup (Recommended)
+
+Set up the complete development environment with one command:
+
+```bash
+make setup-dev
+```
+
+This will automatically:
+- Install hadolint for Dockerfile linting
+- Create a Python virtual environment
+- Install pre-commit hooks for automated code quality checks
+- Configure linting for Dockerfiles, YAML, and Markdown files
+
+#### Manual Setup
+
+If you prefer to install components individually:
+
+```bash
+# Install hadolint for Dockerfile linting
+make install-hadolint
+
+# Create Python virtual environment and install tools
+make venv
+
+# Setup pre-commit hooks
+make pre-commit-install
+```
+
+#### Prerequisites
+
+- **Docker**: Ensure Docker is installed and running
+- **Make**: Available on most Unix-like systems
+- **Python 3**: Required for pre-commit and linting tools
+- **Homebrew** (macOS): Recommended for installing hadolint
+
+### Project Structure
+
+```text
+docker-systemd-images/
+├── Makefile                    # Build automation
+├── README.md                   # This file
+├── .github/workflows/          # CI/CD pipeline
+│   ├── docker-build.yml        # Main build workflow
+│   └── lint.yml               # Code quality checks
+├── debian/                     # Debian-based images
+│   ├── 10/Dockerfile          # Debian 10 (Buster) - EOL
+│   ├── 11/Dockerfile          # Debian 11 (Bullseye)
+│   ├── 12/Dockerfile          # Debian 12 (Bookworm)
+│   └── 13/Dockerfile          # Debian 13 (Trixie)
+└── oraclelinux/               # Oracle Linux images
+    ├── 8/Dockerfile           # Oracle Linux 8
+    └── 9/Dockerfile           # Oracle Linux 9
+```
+
+**Key Features of Each Image:**
+
+- **Debian 10**: Uses archive.debian.org mirrors (EOL), includes Python 3.11 compiled from source
+- **Debian 11-13**: Uses standard repos, includes system Python 3 + additional packages
+- **Oracle Linux 8-9**: Uses dnf package manager, includes Python 3.11 via alternatives system
+
+### Code Quality and Testing Workflow
+
+#### Linting
+
+```bash
+# Lint Dockerfiles only
+make lint
+
+# Lint all files (Dockerfiles, YAML, Markdown)
+make lint-all
+
+# Run pre-commit checks on all files
+make pre-commit-run
+```
+
+#### Testing Images
+
+```bash
+# Test all built images
+make test
+
+# Test specific OS family
+make test-debian
+make test-oraclelinux
+
+# Test specific version
+make test-debian-12
+make test-oraclelinux-8
+```
+
+#### Pre-commit Integration
+
+Once you run `make setup-dev`, pre-commit hooks will automatically run on every commit, checking:
+
+- Dockerfile linting with hadolint
+- YAML formatting and validation
+- Markdown formatting and links
+- Trailing whitespace and file endings
+- Shell script linting (if any)
+
+To bypass pre-commit checks (not recommended):
+
+```bash
+git commit --no-verify -m "commit message"
 ```
 
 ## ⚙️ CI/CD Pipeline (.github/workflows/docker-build.yml)
@@ -97,9 +267,10 @@ You can manually trigger a build run for specific OS families:
 2. Select the Build and Push SystemD Images workflow.
 3. Click Run workflow.
 4. In the dropdown, select the os_family to build:
-  - all (default)
-  - oraclelinux
-  - debian
+
+- all (default)
+- oraclelinux
+- debian
 
 ## 🤝 Contributing
 

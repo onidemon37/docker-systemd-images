@@ -1,6 +1,12 @@
-FROM oraclelinux:8
+# Multi-stage Dockerfile for Oracle Linux with systemd
+# Usage: docker build --build-arg ORACLELINUX_VERSION=8 -t oraclelinux-systemd:8 .
 
-LABEL maintainer="Edino Moniz <edinomoniz@gmail.com"
+ARG ORACLELINUX_VERSION=8
+FROM oraclelinux:${ORACLELINUX_VERSION}
+
+# Metadata
+LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
+LABEL description="Oracle Linux ${ORACLELINUX_VERSION} with systemd"
 
 ENV container=docker
 
@@ -11,8 +17,8 @@ RUN dnf install -y python3.11 python3.11-devel systemd && \
     rm -rf /var/cache/yum
 
 # Remove unnecessary systemd services
-RUN cd /etc/systemd/system/sysinit.target.wants/ ; \
-    for i in * ; do [ $i = systemd-tmpfiles-setup.service ] || rm -f $i ; done ; \
+WORKDIR /etc/systemd/system/sysinit.target.wants/
+RUN for i in * ; do [ "$i" = systemd-tmpfiles-setup.service ] || rm -f "$i" ; done ; \
     rm -f /lib/systemd/system/multi-user.target.wants/* ; \
     rm -f /etc/systemd/system/*.wants/* ; \
     rm -f /lib/systemd/system/local-fs.target.wants/* ; \
@@ -20,6 +26,8 @@ RUN cd /etc/systemd/system/sysinit.target.wants/ ; \
     rm -f /lib/systemd/system/sockets.target.wants/*initctl* ; \
     rm -f /lib/systemd/system/basic.target.wants/* ; \
     rm -f /lib/systemd/system/anaconda.target.wants/*
+
+WORKDIR /
 
 VOLUME ["/sys/fs/cgroup"]
 
