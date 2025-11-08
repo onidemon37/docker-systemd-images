@@ -17,16 +17,16 @@ jobs:
       checks: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
       - name: Lint Markdown (Markdownlint)
-        uses: avto-dev/markdown-lint@v1.5.0
+        uses: avto-dev/markdown-lint@04d43ee9191307b50935a753da3b775ab695eceb # v1.5.0
         with:
           # Checks all Markdown files (.md) recursively
           files: '**/*.md'
 
       - name: Lint Dockerfiles (Hadolint)
-        uses: reviewdog/action-hadolint@v1.50.2
+        uses: reviewdog/action-hadolint@fc7ee4a9f71e521bc43e370819247b70e5327540 # v1.50.2
         with:
           # Targets all Dockerfiles in the project structure
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
           path: .
 
       - name: Validate GitHub Actions Workflow (Actionlint)
-        uses: reviewdog/action-actionlint@v1.68.0
+        uses: reviewdog/action-actionlint@f00ad0691526c10be4021a91b2510f0a769b14d0 # v1.68.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
