@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Oracle Linux with systemd
 # Usage: docker build --build-arg ORACLELINUX_VERSION=9 -t oraclelinux-systemd:9 .
 
-ARG ORACLELINUX_VERSION=9
+ARG ORACLELINUX_VERSION=10
 FROM oraclelinux:${ORACLELINUX_VERSION}
 
 # Metadata
