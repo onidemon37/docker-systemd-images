@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Debian with systemd
 # Usage: docker build --build-arg DEBIAN_VERSION=12 -t debian-systemd:12 .
 
-ARG DEBIAN_VERSION=12
+ARG DEBIAN_VERSION=13
 FROM debian:${DEBIAN_VERSION}
 
 # Metadata
