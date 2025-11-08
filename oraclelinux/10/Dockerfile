@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Oracle Linux with systemd
-# Usage: docker build --build-arg ORACLELINUX_VERSION=9 -t oraclelinux-systemd:9 .
+# Usage: docker build --build-arg ORACLELINUX_VERSION=10 -t oraclelinux-systemd:10 .
 
-ARG ORACLELINUX_VERSION=9
+ARG ORACLELINUX_VERSION=10
 FROM oraclelinux:${ORACLELINUX_VERSION}
 
 # Metadata
@@ -10,9 +10,8 @@ LABEL description="Oracle Linux ${ORACLELINUX_VERSION} with systemd"
 
 ENV container=docker
 
-# Enable Python 3.11 module and install systemd + Python
-RUN dnf install -y python3.11 python3.11-devel systemd && \
-    alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
+# Enable Python 3 module and install systemd + Python
+RUN dnf install -y python3 python3-devel systemd && \
     yum clean all && \
     rm -rf /var/cache/yum
 

@@ -5,13 +5,21 @@ ARG DEBIAN_VERSION=bullseye-slim
 FROM debian:${DEBIAN_VERSION}
 
 # Metadata
-LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com>"
+LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
 LABEL description="Debian ${DEBIAN_VERSION} with systemd"
 
 # 1. Install essential packages (dbus added) and clean up
-RUN INSTALL_PKGS="findutils iproute2 python3 python3-apt sudo systemd dbus" \
-    && apt-get update && apt-get install $INSTALL_PKGS -y --no-install-recommends \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        findutils \
+        iproute2 \
+        python3 \
+        python3-apt \
+        sudo \
+        systemd \
+        dbus \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 2. Remove unnecessary systemd services that don't work well in containers
 RUN find /etc/systemd/system \

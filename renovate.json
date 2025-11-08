@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>onidemon37/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["oraclelinux", "debian"],
+      "commitMessageSuffix": " for systemd containers",
+      "description": "Track base images used in systemd container builds"
+    },
+    {
+      "matchPackageNames": ["oraclelinux"],
+      "matchCurrentVersion": "/^(8|9|10)$/",
+      "enabled": true,
+      "description": "Oracle Linux versions supported in this repo"
+    },
+    {
+      "matchPackageNames": ["debian"],
+      "matchCurrentVersion": "/^(10|11|12|13|buster-slim)$/",
+      "enabled": true,
+      "description": "Debian versions supported in this repo"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
 ARG DEBIAN_VERSION=buster-slim
 FROM debian:${DEBIAN_VERSION}
 
-LABEL maintainer="Edino Moniz <edino.moniz@sectigo.com>"
+LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
 LABEL description="Debian 10 (Buster) with systemd and Python 3.11 for Molecule testing"
 
 ENV container=docker \
@@ -24,14 +24,14 @@ RUN INSTALL_PKGS="findutils iproute2 sudo systemd dbus ca-certificates" \
                 libncursesw5-dev libxml2-dev libxmlsec1-dev \
                 libffi-dev liblzma-dev' \
     && apt-get update \
-    && apt-get install $INSTALL_PKGS $BUILD_DEPS -y --no-install-recommends \
+    && apt-get install ${INSTALL_PKGS} ${BUILD_DEPS} -y --no-install-recommends \
     # Download and build Python 3.11
     && cd /tmp \
     && wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz \
     && tar -xf Python-${PYTHON_VERSION}.tar.xz \
     && cd Python-${PYTHON_VERSION} \
     && ./configure --enable-optimizations --with-ensurepip=install \
-    && make -j $(nproc) \
+    && make -j "$(nproc)" \
     && make altinstall \
     && cd / \
     # Create symlinks for python3.11
