@@ -8,9 +8,9 @@ All resulting container images are stored securely on the GitHub Container Regis
 
 The CI/CD pipeline builds and tags the following image families across multiple OS versions:
 
-| OS Family    | Versions Built        | Full Image Name Format                       |
-|--------------|----------------------|----------------------------------------------|
-| Oracle Linux | `8`, `9`             | `ghcr.io/onidemon37/oraclelinux:<VERSION>` |
+| OS Family    | Versions Built          | Full Image Name Format                       |
+|--------------|------------------------|----------------------------------------------|
+| Oracle Linux | `8`, `9`, `10`         | `ghcr.io/onidemon37/oraclelinux:<VERSION>` |
 | Debian       | `10`, `11`, `12`, `13` | `ghcr.io/onidemon37/debian:<VERSION>`      |
 
 (Note: onidemon37 refers to the GitHub user or organization that owns this repository.)
@@ -110,6 +110,9 @@ docker build --build-arg ORACLELINUX_VERSION=8 -t oraclelinux-systemd:8 ./oracle
 # Oracle Linux 9
 docker build --build-arg ORACLELINUX_VERSION=9 -t oraclelinux-systemd:9 ./oraclelinux/9/
 
+# Oracle Linux 10
+docker build --build-arg ORACLELINUX_VERSION=10 -t oraclelinux-systemd:10 ./oraclelinux/10/
+
 # Debian 12
 docker build --build-arg DEBIAN_VERSION=12 -t debian-systemd:12 ./debian/12/
 
@@ -137,6 +140,11 @@ docker run --rm --privileged \
 docker run --rm --privileged \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   oraclelinux-systemd:8 systemctl --version
+
+# Test Oracle Linux 10
+docker run --rm --privileged \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+  oraclelinux-systemd:10 systemctl --version
 ```
 
 ### Development Environment Setup
@@ -177,12 +185,51 @@ make pre-commit-install
 - **Python 3**: Required for pre-commit and linting tools
 - **Homebrew** (macOS): Recommended for installing hadolint
 
+#### Alternative: Devbox Environment
+
+For a completely isolated development environment, you can use [Devbox](https://www.jetify.com/devbox):
+
+```bash
+# Install devbox (if not already installed)
+curl -fsSL https://get.jetify.com/devbox | bash
+
+# Enter the development environment
+devbox shell
+
+# All tools will be automatically available:
+# - Docker, hadolint, make, Python 3.11, yamllint, shellcheck
+# - Environment variables configured
+# - Helpful aliases available
+```
+
+**Devbox Quick Commands:**
+
+```bash
+# Smart devbox entry (auto-installs if needed)
+make devbox         # Enter devbox environment
+
+# Manual setup
+make install-devbox # Install devbox only
+make setup-devbox   # Complete setup + test
+
+# Check status
+make devbox-status  # Show installation status
+
+# Inside devbox shell
+setup-dev      # Same as: make setup-dev
+build-all      # Same as: make all
+test-all       # Same as: make test
+lint-all       # Same as: make lint-all
+quick-check    # Lint + build debian-12 + test
+```
+
 ### Project Structure
 
 ```text
 docker-systemd-images/
 ├── Makefile                    # Build automation
 ├── README.md                   # This file
+├── renovate.json               # Renovate dependency updates
 ├── .github/workflows/          # CI/CD pipeline
 │   ├── docker-build.yml        # Main build workflow
 │   └── lint.yml               # Code quality checks
@@ -193,14 +240,15 @@ docker-systemd-images/
 │   └── 13/Dockerfile          # Debian 13 (Trixie)
 └── oraclelinux/               # Oracle Linux images
     ├── 8/Dockerfile           # Oracle Linux 8
-    └── 9/Dockerfile           # Oracle Linux 9
+    ├── 9/Dockerfile           # Oracle Linux 9
+    └── 10/Dockerfile          # Oracle Linux 10
 ```
 
 **Key Features of Each Image:**
 
 - **Debian 10**: Uses archive.debian.org mirrors (EOL), includes Python 3.11 compiled from source
 - **Debian 11-13**: Uses standard repos, includes system Python 3 + additional packages
-- **Oracle Linux 8-9**: Uses dnf package manager, includes Python 3.11 via alternatives system
+- **Oracle Linux 8-10**: Uses dnf package manager, includes Python 3.11 via alternatives system
 
 ### Code Quality and Testing Workflow
 
@@ -271,6 +319,20 @@ You can manually trigger a build run for specific OS families:
 - all (default)
 - oraclelinux
 - debian
+
+## 🔄 Automated Dependency Management
+
+This repository uses [Renovate](https://docs.renovatebot.com/) for automated dependency updates:
+
+- **Configuration**: [`renovate.json`](./renovate.json) extends shared configuration from `onidemon37/renovate-config`
+- **Updates**: Automatically creates PRs for base image updates (Oracle Linux, Debian)
+- **Schedule**: Runs on a configured schedule to keep base images current
+- **Security**: Prioritizes security updates and provides vulnerability scanning
+
+The Renovate bot monitors:
+- Docker base images (oraclelinux:8, oraclelinux:9, oraclelinux:10, debian:*)
+- Development dependencies in devbox.json
+- GitHub Actions versions in workflow files
 
 ## 🤝 Contributing
 

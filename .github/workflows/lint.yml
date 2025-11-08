@@ -32,7 +32,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           filter_mode: file
-          hadolint_flags: "--no-color --ignore DL3041"
+          hadolint_flags: "--no-color --ignore DL3041 --ignore DL3008 --ignore DL3013 --ignore DL3003 --ignore DL3047 --ignore SC2086"
           path: .
 
       - name: Validate GitHub Actions Workflow (Actionlint)

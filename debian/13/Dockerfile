@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Debian with systemd
 # Usage: docker build --build-arg DEBIAN_VERSION=12 -t debian-systemd:12 .
 
-ARG DEBIAN_VERSION=13
+ARG DEBIAN_VERSION=trixie
 FROM debian:${DEBIAN_VERSION}
 
 # Metadata
@@ -9,9 +9,17 @@ LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
 LABEL description="Debian ${DEBIAN_VERSION} with systemd"
 
 # 1. Install essential packages (dbus added) and clean up
-RUN INSTALL_PKGS="findutils iproute2 python3 python3-apt sudo systemd dbus" \
-    && apt-get update && apt-get install "${INSTALL_PKGS}" -y --no-install-recommends \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        findutils \
+        iproute2 \
+        python3 \
+        python3-apt \
+        sudo \
+        systemd \
+        dbus \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Remove unnecessary systemd services that don't work well in containers
 RUN find /etc/systemd/system \
