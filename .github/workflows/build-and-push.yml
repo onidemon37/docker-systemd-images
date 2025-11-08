@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [8, 9]
+        version: [8, 9, 10]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
