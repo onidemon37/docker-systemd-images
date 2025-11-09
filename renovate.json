@@ -21,6 +21,15 @@
       "matchCurrentVersion": "/^(10|11|12|13|buster-slim)$/",
       "enabled": true,
       "description": "Debian versions supported in this repo"
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "matchPaths": [
+        "debian/**/Dockerfile",
+        "oraclelinux/**/Dockerfile"
+      ],
+      "enabled": false,
+      "description": "Disable Dockerfile base image updates - we manage these manually"
     }
   ]
 }
