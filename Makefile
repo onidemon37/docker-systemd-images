@@ -27,11 +27,12 @@ DOCKER := $(shell \
 # Docker Desktop PATH fix
 export PATH := /usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:$(PATH)
 
-# Debian versions
+# OS Versions
 DEBIAN_VERSIONS := 10 11 12 13
-
 # Oracle Linux versions
 ORACLELINUX_VERSIONS := 8 9 10
+# Fedora versions (latest 3 releases)
+FEDORA_VERSIONS := 41 42 43
 
 # Colors for output
 GREEN := \033[0;32m
@@ -53,12 +54,13 @@ help:
 	@echo "$(YELLOW)Examples:$(NC)"
 	@echo "  make debian-12          # Build Debian 12 image"
 	@echo "  make oraclelinux-8      # Build Oracle Linux 8 image"
-	@echo "  make oraclelinux-10     # Build Oracle Linux 10 image"
+	@echo "  make fedora-43          # Build Fedora 43 image"
 	@echo "  make debian             # Build all Debian images"
 	@echo "  make oraclelinux        # Build all Oracle Linux images"
+	@echo "  make fedora             # Build all Fedora images"
 	@echo "  make all                # Build all images"
 	@echo "  make test-debian-12     # Test Debian 12 image"
-	@echo "  make test-oraclelinux-10 # Test Oracle Linux 10 image"
+	@echo "  make test-fedora-43     # Test Fedora 43 image"
 	@echo "  make setup-dev          # Setup complete development environment"
 	@echo "  make devbox             # Enter devbox shell (auto-install if needed)"
 	@echo "  make setup-devbox       # Setup devbox isolated environment"
@@ -266,13 +268,16 @@ pre-commit-run: venv
 ## Building and Testing
 
 all: ## Build all images
-all: check-docker debian oraclelinux
+all: check-docker debian oraclelinux fedora
 
 debian: ## Build all Debian images
 debian: $(addprefix debian-, $(DEBIAN_VERSIONS))
 
 oraclelinux: ## Build all Oracle Linux images
 oraclelinux: $(addprefix oraclelinux-, $(ORACLELINUX_VERSIONS))
+
+fedora: ## Build all Fedora images
+fedora: $(addprefix fedora-, $(FEDORA_VERSIONS))
 
 # Individual Debian targets
 debian-10: ## Build Debian 10 image
@@ -354,14 +359,51 @@ oraclelinux-10: ## Build Oracle Linux 10 image
 		-t $(REGISTRY)/oraclelinux:10-$(GIT_COMMIT) \
 		./oraclelinux/10/
 
+# Individual Fedora targets
+fedora-41: ## Build Fedora 41 image
+	@echo "$(GREEN)Building Fedora 41 image...$(NC)"
+	$(DOCKER) build \
+		--build-arg FEDORA_VERSION=41 \
+		--label "build.date=$(BUILD_DATE)" \
+		--label "build.commit=$(GIT_COMMIT)" \
+		-t fedora-systemd:41 \
+		-t $(REGISTRY)/fedora:41 \
+		-t $(REGISTRY)/fedora:41-$(GIT_COMMIT) \
+		./fedora/41/
+
+fedora-42: ## Build Fedora 42 image
+	@echo "$(GREEN)Building Fedora 42 image...$(NC)"
+	$(DOCKER) build \
+		--build-arg FEDORA_VERSION=42 \
+		--label "build.date=$(BUILD_DATE)" \
+		--label "build.commit=$(GIT_COMMIT)" \
+		-t fedora-systemd:42 \
+		-t $(REGISTRY)/fedora:42 \
+		-t $(REGISTRY)/fedora:42-$(GIT_COMMIT) \
+		./fedora/42/
+
+fedora-43: ## Build Fedora 43 image
+	@echo "$(GREEN)Building Fedora 43 image...$(NC)"
+	$(DOCKER) build \
+		--build-arg FEDORA_VERSION=43 \
+		--label "build.date=$(BUILD_DATE)" \
+		--label "build.commit=$(GIT_COMMIT)" \
+		-t fedora-systemd:43 \
+		-t $(REGISTRY)/fedora:43 \
+		-t $(REGISTRY)/fedora:43-$(GIT_COMMIT) \
+		./fedora/43/
+
 test-debian: ## Test Debian images
 test-debian: $(addprefix test-debian-, $(DEBIAN_VERSIONS))
 
 test-oraclelinux: ## Test Oracle Linux images
 test-oraclelinux: $(addprefix test-oraclelinux-, $(ORACLELINUX_VERSIONS))
 
+test-fedora: ## Test Fedora images
+test-fedora: $(addprefix test-fedora-, $(FEDORA_VERSIONS))
+
 test: ## Test all images
-test: test-debian test-oraclelinux
+test: test-debian test-oraclelinux test-fedora
 
 # Individual test targets
 test-debian-10: ## Test Debian 10 image
@@ -391,6 +433,18 @@ test-oraclelinux-9: ## Test Oracle Linux 9 image
 test-oraclelinux-10: ## Test Oracle Linux 10 image
 	@echo "$(YELLOW)Testing Oracle Linux 10 image...$(NC)"
 	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro oraclelinux-systemd:10 systemctl --version
+
+test-fedora-41: ## Test Fedora 41 image
+	@echo "$(YELLOW)Testing Fedora 41 image...$(NC)"
+	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro fedora-systemd:41 systemctl --version
+
+test-fedora-42: ## Test Fedora 42 image
+	@echo "$(YELLOW)Testing Fedora 42 image...$(NC)"
+	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro fedora-systemd:42 systemctl --version
+
+test-fedora-43: ## Test Fedora 43 image
+	@echo "$(YELLOW)Testing Fedora 43 image...$(NC)"
+	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro fedora-systemd:43 systemctl --version
 
 ## Run hadolint on all Dockerfiles
 lint: ## Lint all Dockerfiles with hadolint
@@ -432,7 +486,7 @@ clean-dev: ## Remove development environment (venv, pre-commit)
 ## Show image sizes
 sizes: ## Show sizes of built images
 	@echo "$(GREEN)Docker Image Sizes:$(NC)"
-	@$(DOCKER) images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | grep -E "(debian-systemd|oraclelinux-systemd)" || echo "No images built yet"
+	@$(DOCKER) images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | grep -E "(debian-systemd|oraclelinux-systemd|fedora-systemd)" || echo "No images built yet"
 
 ## Push images to registry (requires docker login)
 push: ## Push all built images to registry
@@ -449,6 +503,13 @@ push: ## Push all built images to registry
 			echo "Pushing Oracle Linux $$version..."; \
 			$(DOCKER) push $(REGISTRY)/oraclelinux:$$version; \
 			$(DOCKER) push $(REGISTRY)/oraclelinux:$$version-$(GIT_COMMIT); \
+		fi \
+	done
+	@for version in $(FEDORA_VERSIONS); do \
+		if $(DOCKER) images | grep -q "$(REGISTRY)/fedora.*$$version[[:space:]]"; then \
+			echo "Pushing Fedora $$version..."; \
+			$(DOCKER) push $(REGISTRY)/fedora:$$version; \
+			$(DOCKER) push $(REGISTRY)/fedora:$$version-$(GIT_COMMIT); \
 		fi \
 	done
 

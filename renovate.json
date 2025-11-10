@@ -6,7 +6,7 @@
   "packageRules": [
     {
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["oraclelinux", "debian"],
+      "matchPackageNames": ["oraclelinux", "debian", "fedora"],
       "commitMessageSuffix": " for systemd containers",
       "description": "Track base images used in systemd container builds"
     },
@@ -23,10 +23,17 @@
       "description": "Debian versions supported in this repo"
     },
     {
+      "matchPackageNames": ["fedora"],
+      "matchCurrentVersion": "/^(41|42|43)$/",
+      "enabled": true,
+      "description": "Fedora versions supported in this repo (latest 3 releases)"
+    },
+    {
       "matchManagers": ["dockerfile"],
       "matchPaths": [
         "debian/**/Dockerfile",
-        "oraclelinux/**/Dockerfile"
+        "oraclelinux/**/Dockerfile",
+        "fedora/**/Dockerfile"
       ],
       "enabled": false,
       "description": "Disable Dockerfile base image updates - we manage these manually"
