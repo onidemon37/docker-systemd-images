@@ -60,12 +60,20 @@ jobs:
         with:
           context: ./oraclelinux/${{ matrix.version }}
           file: ./oraclelinux/${{ matrix.version }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/oraclelinux:${{ matrix.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/oraclelinux:${{ matrix.version }}-${{ env.short_sha }}
-
-
+          labels: |
+            org.opencontainers.image.title=Oracle Linux ${{ matrix.version }}
+            org.opencontainers.image.description=Oracle Linux ${{ matrix.version }} with SystemD support
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ matrix.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+          cache-from: type=gha,scope=oracle-${{ matrix.version }}
+          cache-to: type=gha,mode=max,scope=oracle-${{ matrix.version }}
 
   build-debian:
     runs-on: ubuntu-latest
@@ -106,9 +114,71 @@ jobs:
         with:
           context: ./debian/${{ matrix.version }}
           file: ./debian/${{ matrix.version }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/debian:${{ matrix.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/debian:${{ matrix.version }}-${{ env.short_sha }}
+          labels: |
+            org.opencontainers.image.title=Debian ${{ matrix.version }}
+            org.opencontainers.image.description=Debian ${{ matrix.version }} with SystemD support
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ matrix.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
           cache-from: type=gha,scope=debian-${{ matrix.version }}
           cache-to: type=gha,mode=max,scope=debian-${{ matrix.version }}
+  
+  build-fedora:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'workflow_dispatch' ||
+      github.event.inputs.os_family == 'all' ||
+      github.event.inputs.os_family == 'fedora'
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [8, 9, 10]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set short SHA
+        run: echo "short_sha=$(echo ${GITHUB_SHA} | cut -c1-7)" >> "${GITHUB_ENV}"
+
+      - name: Build and push
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: ./fedora/${{ matrix.version }}
+          file: ./fedora/${{ matrix.version }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/fedora:${{ matrix.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/fedora:${{ matrix.version }}-${{ env.short_sha }}
+          labels: |
+            org.opencontainers.image.title=Fedora Linux ${{ matrix.version }}
+            org.opencontainers.image.description=Fedora Linux ${{ matrix.version }} with SystemD support
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ matrix.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+          cache-from: type=gha,scope=fedora-${{ matrix.version }}
+          cache-to: type=gha,mode=max,scope=fedora-${{ matrix.version }}
