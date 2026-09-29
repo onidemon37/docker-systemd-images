@@ -30,7 +30,7 @@ export PATH := /usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:$(
 # OS Versions
 DEBIAN_VERSIONS := 10 11 12 13
 # Oracle Linux versions
-ORACLELINUX_VERSIONS := 8 9 10
+ORACLELINUX_VERSIONS := 7 8 9 10
 # Fedora versions (latest 3 releases)
 FEDORA_VERSIONS := 41 42 43
 
@@ -53,7 +53,10 @@ help:
 	@echo ""
 	@echo "$(YELLOW)Examples:$(NC)"
 	@echo "  make debian-12          # Build Debian 12 image"
+	@echo "  make oraclelinux-7      # Build Oracle Linux 7 image"
 	@echo "  make oraclelinux-8      # Build Oracle Linux 8 image"
+	@echo "  make oraclelinux-9      # Build Oracle Linux 9 image"
+	@echo "  make oraclelinux-10     # Build Oracle Linux 10 image"
 	@echo "  make fedora-43          # Build Fedora 43 image"
 	@echo "  make debian             # Build all Debian images"
 	@echo "  make oraclelinux        # Build all Oracle Linux images"
@@ -326,6 +329,16 @@ debian-13: ## Build Debian 13 image
 		./debian/13/
 
 # Individual Oracle Linux targets
+oraclelinux-7: ## Build Oracle Linux 7 image
+	@echo "$(GREEN)Building Oracle Linux 7 image...$(NC)"
+	$(DOCKER) build \
+		--label "build.date=$(BUILD_DATE)" \
+		--label "build.commit=$(GIT_COMMIT)" \
+		-t oraclelinux-systemd:7 \
+		-t $(REGISTRY)/oraclelinux:7 \
+		-t $(REGISTRY)/oraclelinux:7-$(GIT_COMMIT) \
+		./oraclelinux/7/
+
 oraclelinux-8: ## Build Oracle Linux 8 image
 	@echo "$(GREEN)Building Oracle Linux 8 image...$(NC)"
 	$(DOCKER) build \
@@ -422,6 +435,10 @@ test-debian-13: ## Test Debian 13 image
 	@echo "$(YELLOW)Testing Debian 13 image...$(NC)"
 	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro debian-systemd:13 systemctl --version
 
+test-oraclelinux-7: ## Test Oracle Linux 7 image
+	@echo "$(YELLOW)Testing Oracle Linux 7 image...$(NC)"
+	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro oraclelinux-systemd:7 systemctl --version
+
 test-oraclelinux-8: ## Test Oracle Linux 8 image
 	@echo "$(YELLOW)Testing Oracle Linux 8 image...$(NC)"
 	$(DOCKER) run --rm --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro oraclelinux-systemd:8 systemctl --version
@@ -450,11 +467,11 @@ test-fedora-43: ## Test Fedora 43 image
 lint: ## Lint all Dockerfiles with hadolint
 	@echo "$(YELLOW)Linting Dockerfiles...$(NC)"
 	@if command -v hadolint >/dev/null 2>&1; then \
-		find . -name "Dockerfile" -exec echo "Linting {}" \; -exec hadolint --ignore DL3041 --ignore DL3008 --ignore DL3013 --ignore DL3003 --ignore DL3047 --ignore SC2086 {} \; || true; \
+		find . -name "Dockerfile" -exec echo "Linting {}" \; -exec hadolint --ignore DL3041 --ignore DL3033 --ignore DL3008 --ignore DL3013 --ignore DL3003 --ignore DL3047 --ignore SC2086 {} \; || true; \
 	else \
 		echo "$(RED)hadolint not found. Install with: make install-hadolint$(NC)"; \
 		echo "$(YELLOW)Running hadolint via Docker instead...$(NC)"; \
-		find . -name "Dockerfile" -exec echo "Linting {}" \; -exec $(DOCKER) run --rm -i hadolint/hadolint:latest hadolint --ignore DL3041 --ignore DL3008 --ignore DL3013 --ignore DL3003 --ignore DL3047 --ignore SC2086 - < {} \; || true; \
+		find . -name "Dockerfile" -exec echo "Linting {}" \; -exec $(DOCKER) run --rm -i hadolint/hadolint:latest hadolint --ignore DL3041 --ignore DL3033 --ignore DL3008 --ignore DL3013 --ignore DL3003 --ignore DL3047 --ignore SC2086 - < {} \; || true; \
 	fi
 
 lint-all: ## Run all linting (Dockerfile, YAML, Markdown via pre-commit)
