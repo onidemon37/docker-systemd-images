@@ -25,7 +25,17 @@ RUN yum install -y systemd python3 curl tar gzip && \
 # way). Left as /usr/bin/python3.11, not overwriting the system python3 -
 # matches the real target exactly, and Ansible's own interpreter
 # auto-discovery already prefers python3.11 over plain python3.
-RUN curl -sL -o /tmp/python311.tar.gz 'https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.11.16%2B20260929-x86_64-unknown-linux-gnu-install_only.tar.gz' && \
+#
+# Must match the build host's arch, not be hardcoded - a hardcoded x86_64
+# download baked into an arm64 build produces a foreign-arch binary that
+# only "runs" under Rosetta and crashes (confirmed: rc=133, rosetta error
+# "failed to open elf at /lib64/ld-linux-x86-64.so.2").
+RUN case "$(uname -m)" in \
+      x86_64) PY_ARCH=x86_64-unknown-linux-gnu ;; \
+      aarch64) PY_ARCH=aarch64-unknown-linux-gnu ;; \
+      *) echo "Unsupported build architecture: $(uname -m)" >&2; exit 1 ;; \
+    esac && \
+    curl -sL -o /tmp/python311.tar.gz "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.11.16%2B20260929-${PY_ARCH}-install_only.tar.gz" && \
     mkdir -p /opt/python3.11 && \
     tar -xzf /tmp/python311.tar.gz -C /opt/python3.11 --strip-components=1 && \
     ln -sf /opt/python3.11/bin/python3.11 /usr/bin/python3.11 && \
