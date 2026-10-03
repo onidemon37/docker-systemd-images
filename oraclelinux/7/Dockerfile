@@ -5,7 +5,7 @@
 # no dnf at all (yum only), so it needs genuinely different package-install
 # steps, not just a different tag on the same Dockerfile.
 
-FROM oraclelinux:7
+FROM oraclelinux:10
 
 # Metadata
 LABEL maintainer="Edino Moniz <edinomoniz@gmail.com>"
