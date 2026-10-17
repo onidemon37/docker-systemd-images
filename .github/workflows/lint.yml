@@ -36,7 +36,7 @@ jobs:
           path: .
 
       - name: Validate GitHub Actions Workflow (Actionlint)
-        uses: reviewdog/action-actionlint@f00ad0691526c10be4021a91b2510f0a769b14d0 # v1.68.0
+        uses: reviewdog/action-actionlint@b76d06f8570118465db3190c9a08f1b29d341aa1 # v1.80.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
